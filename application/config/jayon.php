@@ -25,10 +25,17 @@ if($_SERVER['HTTP_HOST'] == 'localhost'){
 	$config['thumbnail_path'] = '/Library/WebServer/Documents/jayonadmindev/public/receiver_thumb/';
 }else{
 	//online version should redirect to main site
+<<<<<<< HEAD
 	$config['api_url'] = 'http://www.jayonexpress.com/jayonadmin/api/v1/';
 	$config['admin_url'] = 'http://www.jayonexpress.com/jayonadmin/';
 	$config['picture_path'] = '/var/www/jayonadmin/public/receiver/';
 	$config['thumbnail_path'] = '/var/www/jayonadmin/public/receiver_thumb/';
+=======
+	$config['api_url'] = 'http://www.jayonexpress.com/staging/jayonadmin/api/v1/';
+	$config['admin_url'] = 'http://www.jayonexpress.com/staging/jayonadmin/';
+	$config['picture_path'] = '/var/www/staging/jayonadmin/public/receiver/';
+	$config['thumbnail_path'] = '/var/www/staging/jayonadmin/public/receiver_thumb/';
+>>>>>>> e724fdc38b319771af935ee2662af708df906849
 }
 
 

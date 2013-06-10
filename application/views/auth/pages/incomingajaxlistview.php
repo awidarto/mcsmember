@@ -2,6 +2,12 @@
 	var asInitVals = new Array();
 	var dateBlock = <?php print getdateblock();?>;
 	var rescheduled_id = 0;
+
+	function closeOrder(){
+		alert('closing window');
+		$('#neworder_dialog').dialog('close');
+		return true;
+	}
 	
 	$(document).ready(function() {
 	    var oTable = $('.dataTable').dataTable(
@@ -133,7 +139,7 @@
 			}
 			return [select,css,popup];
 		}
-		
+
 		//$('#search_deliverytime').datepicker({ dateFormat: 'yy-mm-dd' });
 		//$('#assign_deliverytime').datepicker({ dateFormat: 'yy-mm-dd' });
 		
@@ -454,10 +460,13 @@
 				Close: function() {
 					oTable.fnDraw();
 					$( this ).dialog( "close" );
+					$('#sendingorder').hide();
+					$('#sendingstatus').hide();
 				}
 			},
 			close: function() {
-				
+				$('#sendingorder').hide();
+				$('#sendingstatus').hide();				
 			}
 		});
 
@@ -567,6 +576,11 @@
 
 <div id="neworder_dialog" title="New Order" style="overflow:hidden;padding:8px;">
 	<input type="hidden" value="" id="print_id" />
+	<div id="sendingorder" style="display:none;">
+	    <img src="<?php print base_url();?>assets/images/ajax_loader.gif" /> Processing...
+	</div>
+	<div id="sendingstatus" style="display:none;">
+	</div>
 	<iframe id="neworder_frame" name="print_frame" width="100%" height="100%"
     marginWidth="0" marginHeight="0" frameBorder="0" scrolling="auto"
     title="New Order">Your browser does not suppr</iframe>

