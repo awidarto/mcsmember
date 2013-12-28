@@ -116,27 +116,27 @@ function ajax_find_cities($zone,$col = 'city'){
 	return $q->result_array();
 }
 
-function ajax_find_buyer($zone,$col = 'fullname',$idcol = 'id',$merchant_id = null){
-	$CI =& get_instance();
-	$group_id = user_group_id('buyer');
+function ajax_find_buyer($zone,$col = 'buyer_name',$idcol = 'id',$merchant_id = null){
+    $CI =& get_instance();
 
-	$CI->db->like('members.fullname',$zone)
-		->or_like('members.merchantname',$zone)
-		->or_like('members.username',$zone)
-		->or_like('members.email',$zone)
-		->where('members.group_id',$group_id)
-		->distinct();
 
-	if(is_null($merchant_id)){
-		$CI->db->select($idcol.' as id ,'.$col.' as label, '.$col.' as value, email as email, concat_ws(\',\',street,district,province,city,country) as shipping, phone as phone',false);
-	}else{
-		$CI->db->select('members.'.$idcol.' as id ,members.'.$col.' as label, members.'.$col.' as value, m.merchant_id as merchant_id, members.email as email, concat_ws(\',\',street,district,province,city,country) as shipping, members.phone as phone',false);
-		$CI->db->join($CI->config->item('assigned_delivery_table').' as m','members.id = m.buyer_id','left');
-		$CI->db->where('merchant_id',$merchant_id);
-	}
+    $CI->db->distinct();
+    if(!is_null($merchant_id)){
+        $CI->db->where('buyers.merchant_id',$merchant_id);
+    }
+    $CI->db->and_()
+        ->group_start()->like('buyers.buyer_name',$zone)
+        ->or_like('buyers.email',$zone)
+        ->group_end();
 
-	$q = $CI->db->get('members');
-	return $q->result_array();
+    $CI->db->select('buyers.'.$idcol.' as id ,buyers.'.$col.' as label, buyers.'.$col.' as value, buyers.merchant_id as merchant_id, buyers.email as email, buyers.shipping_address as shipping, buyers.mobile1 as mobile1,buyers.mobile2 as mobile2, buyers.phone as phone',false);
+    //$CI->db->join($CI->config->item('assigned_delivery_table').' as m','buyers.id = m.buyer_id','left');
+
+
+    $q = $CI->db->get('buyers');
+
+
+    return $q->result_array();
 }
 
 function ajax_find_buyer_email($zone,$col = 'fullname',$idcol = 'id'){
@@ -377,42 +377,65 @@ function get_pickup_charge_table($app_id){
 
 }
 
+function getdateblock($month = null, $city = null){
+    $CI =& get_instance();
+    $blocking = array();
+    $month = (is_null($month))?date('m',time()):$month;
+    $year = date('Y',time());
 
-function getdateblock($month = null){
-	$blocking = array();
-	$month = (is_null($month))?date('m',time()):$month;
-	$year = date('Y',time());
+    //determine max daily capacity by city ( as devices are assigned by city )
+    if(!is_null($city)){
+        $devnum = $CI->db
+            ->where('city',$city)
+            ->count_all_results($CI->config->item('jayon_devices_table'));
+    }else{
+        $devnum = 1;
+    }
 
-	$holidays = getholidays();
-	$weekend_on = get_option('weekend_delivery');
-	$holiday_on = get_option('holiday_delivery');
+    $maxcap = get_option('daily_shifts') * get_option('quota_per_shift') * $devnum;
 
-	//print_r($holidays);
+    //get holidays
 
-	for($m = $month; $m < ($month + 2);$m++){
-		for($i = 1;$i < 32;$i++){
-			//print $date."\r\n";
-			if(checkdate($m,$i,$year)){
-				//check weekends
-				$month = str_pad($m,2,'0',STR_PAD_LEFT);
-				$day = str_pad($i,2,'0',STR_PAD_LEFT);
-				$date = $year.'-'.$month.'-'.$day;
-				$day = getdate(strtotime($date));
-				//print_r($day)."\r\n";
+    $holidays = getholidays();
 
-				if(($day['weekday'] == 'Sunday' || $day['weekday'] == 'Saturday') && !$weekend_on){
-					$blocking[$date] = 'weekend';
-				}else if(in_array($date, $holidays) && !$holiday_on){
-					$blocking[$date] = 'holiday';
-				}else if(overquota($date)){
-					$blocking[$date] = 'overquota';
-				}else{
-					$blocking[$date] = 'open';
-				}
-			}
-		}
-	}
-	return json_encode($blocking);
+    $maxholiday = getmaxholiday();
+
+    $maxyear = date('Y',strtotime($maxholiday));
+    $maxmonth = date('m',strtotime($maxholiday));
+
+    $weekend_on = get_option('weekend_delivery');
+    $holiday_on = get_option('holiday_delivery');
+
+    for($y = $year; $y <= $maxyear ;$y++){
+        if($y > $year){
+            $month = 1;
+        }
+        for($m = $month; $m < ($month + 3);$m++){
+            for($i = 1;$i < 32;$i++){
+                //print $date."\r\n";
+                if(checkdate($m,$i,$y)){
+                    //check weekends
+                    $month = str_pad($m,2,'0',STR_PAD_LEFT);
+                    $day = str_pad($i,2,'0',STR_PAD_LEFT);
+                    $date = $y.'-'.$month.'-'.$day;
+                    $day = getdate(strtotime($date));
+                    //print_r($day)."\r\n";
+                    if(($day['weekday'] == 'Sunday' || $day['weekday'] == 'Saturday') && !$weekend_on){
+                        //print $date." : ".$slot."\r\n";
+                        $blocking[$date] = 'weekend';
+                    }else if(in_array($date, $holidays) && !$holiday_on){
+                        $blocking[$date] = 'holiday';
+                    }else if(overquota($date)){
+                        $blocking[$date] = 'overquota';
+                    }else{
+                        $blocking[$date] = 'open';
+                    }
+                }
+            }
+        }
+    }
+
+    return json_encode($blocking);
 }
 
 function overquota($date){
@@ -456,6 +479,13 @@ function getholidays(){
 		$h[] = $value['holiday'];
 	}
 	return $h;
+}
+
+function getmaxholiday(){
+    $CI =& get_instance();
+    $CI->db->select_max('holiday');
+    $maxholiday = $CI->db->get($CI->config->item('jayon_holidays_table'))->row();
+    return $maxholiday->holiday;
 }
 
 function get_thumbnail($delivery_id){
