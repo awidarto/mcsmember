@@ -591,6 +591,90 @@
             }
         });
 
+
+        $('#phone' ).autocomplete({
+            //source: '<?php print site_url('ajax/getbuyerphone')?>',
+            source:function(request,response){
+                var request_data = {
+                    term: request.term,
+                    merchant_id: $('#merchant_id').val()
+                };
+
+                var url = '<?php print site_url('ajax/getbuyerphone')?>';
+
+                $.post(url, request_data, function (data, status, xhr) {
+                     response(data);
+                },'json');
+            },
+            method: 'post',
+            minLength: 5,
+            select:function(event,ui){
+                $('#buyer_id').val(ui.item.id);
+                $('#buyer_id_txt').html(ui.item.id);
+                $('#buyer_name').val(ui.item.buyer_name)
+                $('#shipping_address').val(ui.item.shipping);
+                $('#phone').val(ui.item.phone);
+                $('#mobile1').val(ui.item.mobile1);
+                $('#mobile2').val(ui.item.mobile2);
+            }
+        });
+
+        $('#mobile1' ).autocomplete({
+            //source: '<?php print site_url('ajax/getbuyerphone')?>',
+            source:function(request,response){
+                var request_data = {
+                    term: request.term,
+                    merchant_id: $('#merchant_id').val()
+                };
+
+                var url = '<?php print site_url('ajax/getbuyermobile1')?>';
+
+                $.post(url, request_data, function (data, status, xhr) {
+                     response(data);
+                },'json');
+            },
+            method: 'post',
+            minLength: 5,
+            select:function(event,ui){
+                $('#buyer_id').val(ui.item.id);
+                $('#buyer_id_txt').html(ui.item.id);
+                $('#buyer_name').val(ui.item.buyer_name)
+                $('#shipping_address').val(ui.item.shipping);
+                $('#phone').val(ui.item.phone);
+                $('#mobile1').val(ui.item.mobile1);
+                $('#mobile2').val(ui.item.mobile2);
+            }
+        });
+
+        $('#mobile2' ).autocomplete({
+            //source: '<?php print site_url('ajax/getbuyerphone')?>',
+            source:function(request,response){
+                var request_data = {
+                    term: request.term,
+                    merchant_id: $('#merchant_id').val()
+                };
+
+                var url = '<?php print site_url('ajax/getbuyermobile2')?>';
+
+                $.post(url, request_data, function (data, status, xhr) {
+                     response(data);
+                },'json');
+            },
+            method: 'post',
+            minLength: 5,
+            select:function(event,ui){
+                $('#buyer_id').val(ui.item.id);
+                $('#buyer_id_txt').html(ui.item.id);
+                $('#buyer_name').val(ui.item.buyer_name)
+                $('#shipping_address').val(ui.item.shipping);
+                $('#phone').val(ui.item.phone);
+                $('#mobile1').val(ui.item.mobile1);
+                $('#mobile2').val(ui.item.mobile2);
+            }
+        });
+
+
+
         $( '#buyerdeliverycity' ).autocomplete({
             source: '<?php print site_url('ajax/getcities')?>',
             method: 'post',
@@ -1305,7 +1389,7 @@
                                 <td>
                                     ID : <span id="buyer_id_txt"></span><br />
                                     <input type="hidden" value="" id="buyer_id" name="buyer_id" />
-                                    <input type="text" id="buyer_name" name="buyer_name" value="" />
+                                    <input type="text" id="buyer_name" name="buyer_name" value="" /> **
                                 </td>
                             </tr>
                             <tr class="buyer_info">
@@ -1337,19 +1421,20 @@
                             <tr>
                                 <td>Mobile 1<hr /><span class="fine">Mobile 1</span></td>
                                 <td>
-                                    <input type="text" id="mobile1" name="mobile1" value="" />
+                                    <input type="text" id="mobile1" name="mobile1" value="" /> **
                                 </td>
                             </tr>
                             <tr>
                                 <td>Mobile 2<hr /><span class="fine">Mobile 2</span></td>
                                 <td>
-                                    <input type="text" id="mobile2" name="mobile2" value="" />
+                                    <input type="text" id="mobile2" name="mobile2" value="" /> **
                                 </td>
                             </tr>
                             <tr>
                                 <td>Phone<hr /><span class="fine">Telepon</span></td>
                                 <td>
-                                    <input type="text" id="phone" name="phone" value="" />
+                                    <input type="text" id="phone" name="phone" value="" /> **<br />
+                                    ** autocomplete
                                 </td>
                             </tr>
                             <tr>
