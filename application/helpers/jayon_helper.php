@@ -172,11 +172,13 @@ function ajax_find_buyer_email($zone,$col = 'fullname',$idcol = 'id'){
 
 function get_merchant($id = null,$flatten = true){
 	$CI =& get_instance();
-	if(!is_null($id)){
-		 $CI->db->where('id',$id);
-	}
 
-	$CI->db->where('group_id',user_group_id('merchant'));
+	if(!is_null($id)){
+        $CI->db->where('id',$id);
+	}else{
+        $CI->db->where('group_id',user_group_id('merchant'));
+    }
+
 
 	$q = $CI->db->select(array('id','fullname','merchantname'))->get('members');
 	if($flatten){
@@ -184,7 +186,9 @@ function get_merchant($id = null,$flatten = true){
 			$result[$val['id']] = $val['fullname'];
 		}
 		return $result;
-	}if(!is_null($id)){
+	}
+
+    if(!is_null($id)){
 		return $q->row_array();
 	}else{
 		return $q->result_array();
@@ -326,6 +330,7 @@ function get_city_status(){
 
 	return $res;
 }
+
 function user_group_id($group)
 {
 	$CI =& get_instance();
@@ -506,6 +511,7 @@ function getmaxholiday(){
     return $maxholiday->holiday;
 }
 
+/*
 function get_thumbnail($delivery_id, $class = 'thumb'){
 	$CI =& get_instance();
 
@@ -530,6 +536,62 @@ function get_thumbnail($delivery_id, $class = 'thumb'){
 
 	return $thumbnail;
 }
+*/
+
+function get_thumbnail($delivery_id, $class = 'thumb'){
+    $CI =& get_instance();
+
+    $existingpic = glob($CI->config->item('picture_path').$delivery_id.'*.jpg');
+
+    //print_r($existingpic);
+
+    $pidx = count($existingpic);
+
+    if(file_exists($CI->config->item('picture_path').$delivery_id.'.jpg')){
+        if(file_exists($CI->config->item('thumbnail_path').'th_'.$delivery_id.'.jpg')){
+            $thumbnail = base_url().'public/receiver_thumb/th_'.$delivery_id.'.jpg';
+            $thumbnail = sprintf('<img style="cursor:pointer;" class="'.$class.'" alt="'.$delivery_id.'" src="%s?'.time().'" /><br /><span class="rotate" id="r_'.$delivery_id.'" style="cursor:pointer;"  >rotate CW</span>',$thumbnail);
+        }else{
+            if(generate_thumbnail($delivery_id)){
+                $thumbnail = base_url().'public/receiver_thumb/th_'.$delivery_id.'.jpg';
+                $thumbnail = sprintf('<img style="cursor:pointer;" class="'.$class.'" alt="'.$delivery_id.'" src="%s?'.time().'" /><br /><span class="rotate" id="r_'.$delivery_id.'" style="cursor:pointer;"  >rotate CW</span>',$thumbnail);
+            }else{
+                $thumbnail = $CI->ag_asset->load_image('th_nopic.jpg');
+                $thumbnail = sprintf('<img style="cursor:pointer;" class="'.$class.'" alt="'.$delivery_id.'" src="%s?'.time().'" /><br /><span class="rotate" id="r_'.$delivery_id.'" style="cursor:pointer;"  >rotate CW</span>',$thumbnail);
+            }
+        }
+    }else{
+        if(file_exists($CI->config->item('thumbnail_path').'th_'.$delivery_id.'.jpg')){
+            $thumbnail = base_url().'public/receiver_thumb/th_'.$delivery_id.'.jpg';
+            $thumbnail = sprintf('<img style="cursor:pointer;" class="'.$class.'" alt="'.$delivery_id.'" src="%s?'.time().'" /><br /><span class="rotate" id="r_'.$delivery_id.'" style="cursor:pointer;"  >rotate CW</span>',$thumbnail);
+        }else{
+            $thumbnail = base_url().'assets/images/th_nopic.jpg';
+            $thumbnail = sprintf('<img style="cursor:pointer;" class="'.$class.'" alt="'.$delivery_id.'" src="%s?'.time().'" /><br /><span class="rotate" id="r_'.$delivery_id.'" style="cursor:pointer;"  >rotate CW</span>',$thumbnail);
+        }
+    }
+
+    if(file_exists($CI->config->item('picture_path').$delivery_id.'_sign.jpg')){
+        //if(file_exists($CI->config->item('thumbnail_path').'th_'.$delivery_id.'_sign.jpg')){
+            $sthumbnail = base_url().'public/receiver/'.$delivery_id.'_sign.jpg';
+            $thumbnail .= sprintf('<img style="cursor:pointer;width:100px;height:auto;" class="sign '.$class.'" alt="'.$delivery_id.'" src="%s?'.time().'" />',$sthumbnail);
+        //}
+    }
+
+
+    $gal = '<br />'.$pidx.' pics';
+
+    if($pidx > 0){
+        for($g = 0; $g < $pidx; $g++){
+            $img = str_replace($CI->config->item('picture_path'), '', $existingpic[$g]);
+            $gal .= '<input type="hidden" class="gal_'.$delivery_id.'" value="'.$img.'" >';
+        }
+    }
+
+    $thumbnail = $thumbnail.$gal;
+
+    return $thumbnail;
+}
+
 
 function delivery_log($data){
 	$CI =& get_instance();
