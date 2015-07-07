@@ -677,8 +677,8 @@
 
 </script>
 <div class="button_nav">
-    <a class="button add" id="import" style="cursor:pointer;" href="<?php echo site_url('/admin/import') ?>">Import</a>
-	<span class="button add" id="neworder" style="cursor:pointer;">New Order</span>
+    <a class="button add" id="awblist" style="cursor:pointer;" href="<?php echo site_url('/admin/awbtemplate/listing') ?>">AWB Template Download</a>
+    <a class="button add" id="awbimport" style="cursor:pointer;" href="<?php echo site_url('/admin/awbimport') ?>">AWB Update</a>
 </div>
 <?php print form_checkbox('assign_all',1,FALSE,'id="assign_all"');?> Select All
 

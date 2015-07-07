@@ -41,6 +41,126 @@ class Dl extends Application
 
     }
 
+    public function awbtemplate(){
+
+        $fn = $this->input->post();
+
+        $inc = $this->config->item('incoming_delivery_table');
+
+        $this->db->select('m.merchantname as merchant_name,delivery_id, merchant_trans_id, fulfillment_code, logistic_awb,'.$inc.'.created');
+
+        $this->db->from($this->config->item('incoming_delivery_table'));
+
+        $this->db->join('members as m',$this->config->item('incoming_delivery_table').'.merchant_id=m.id','left');
+
+        $this->db->where($inc.'.merchant_id',$fn['merchant_id']);
+        $this->db->where($inc.'.created >=', $fn['date_from'].' 00:00:00');
+        $this->db->where($inc.'.created <=', $fn['date_to'].' 23:59:59');
+
+        $data = $this->db->order_by('created','desc')
+                    ->get();
+
+        $last_query = $this->db->last_query();
+
+        $result = $data->result_array();
+
+        //print_r($sdata);
+
+        $aadata = array();
+
+        $num = 0;
+
+        $headrow = array(
+            'Logistic',
+            'Delivery ID',
+            'No Kode Penjualan Toko',
+            'Fulfillment / Order ID',
+            'Logistic AWB'
+        );
+
+        $fieldrow = array(
+            'merchant_name',
+            'delivery_id',
+            'merchant_trans_id',
+            'fulfillment_code',
+            'logistic_awb'
+        );
+
+        $this->load->library('xlswrite');
+        $xlswrite = new Xlswrite();
+        $xlswrite->setActiveSheetIndex(0);
+
+        $colnames = $this->config->item('xls_columns');
+
+        $colindex = 0;
+        foreach($headrow as $d){
+            $cellname = $colnames[$colindex]."1";
+            $xlswrite->getActiveSheet()->SetCellValue($cellname, $d );
+            $colindex++;
+        }
+
+        $colindex = 0;
+        foreach($fieldrow as $d){
+            $cellname = $colnames[$colindex]."2";
+            $xlswrite->getActiveSheet()->SetCellValue($cellname, $d );
+            $colindex++;
+        }
+
+        $num = 1;
+        //foreach($result as $value => $key)
+        for($i = 0; $i < count($result);$i++)
+        {
+            $key = $result[$i];
+
+            $num++;
+
+            $xdata = array(
+                $key['merchant_name'],
+                $key['delivery_id'],
+                $key['merchant_trans_id'],
+                $key['fulfillment_code'],
+                $key['logistic_awb']
+            );
+
+            $aadata[] = $xdata;
+
+            $colindex = 0;
+            foreach($xdata as $d){
+                $cellname = $colnames[$colindex].($num + 1);
+                $xlswrite->getActiveSheet()->SetCellValue($cellname, $d );
+                $colindex++;
+            }
+
+        }
+
+
+
+        $fname = $fn['date_from'].'_'.$fn['date_to'].'_'.$fn['merchant_id'].'_awb_template.csv';
+        $xname = $fn['date_from'].'_'.$fn['date_to'].'_'.$fn['merchant_id'].'_awb_template.xlsx';
+
+        $xlswrite->xlsx(FCPATH.'public/dl/'.$xname);
+
+        $fp = fopen(FCPATH.'public/dl/'.$fname, 'w');
+
+        $head = 0;
+        foreach ($aadata as $fields) {
+            if($head == 0){
+                $heads = $headrow;
+                fputcsv($fp, $heads, ',' , '"');
+                fputcsv($fp, $fields, ',' , '"');
+            }else{
+                fputcsv($fp, $fields, ',' , '"');
+            }
+            $head++;
+        }
+
+        fclose($fp);
+
+        $urlcsv = base_url().'admin/dl/out/'.$xname;
+        $result = array( 'status'=>'OK','data'=>array('urlcsv'=>$urlcsv), 'q'=>$last_query );
+        print json_encode($result);
+    }
+
     public function dispatch(){
 
         $filter = $this->input->post('datafilter');

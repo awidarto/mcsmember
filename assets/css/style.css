@@ -3,11 +3,11 @@ body,ul,ol,li{
 	padding:0;
 }
 
-body{padding:0px;background: url('../images/long_logo.png') no-repeat right top;background-color:white;color:#231e18;background-repeat:no-repeat;margin:0;font-family:'Trebuchet Ms', 'Yanone Kaffeesatz', Lato, Lobster, 'Lobster Two','Droid Sans', Arial ;font-size:12px;}
+body{padding:0px;background: url('../images/long_logo.png') no-repeat right top;background-color:white;background-repeat:no-repeat;margin:0;font-family:'Trebuchet Ms', 'Yanone Kaffeesatz', Lato, Lobster, 'Lobster Two','Droid Sans', Arial ;font-size:12px;}
 #container{margin:0px auto;padding:10px 20px;}
-#header{width:100%;margin:0;padding:0;border-botton:thin solid #efefef;}
+#header{width:100%;margin:0;padding:0;border-bottom:thin solid #efefef;}
 #logo{width:1000px;margin:0 auto;color:#231e18;height:150px;}
-#nav_bg{background:brown;width:100%;padding-top:4px;}
+#nav_bg{background:#4118c2;width:100%;padding-top:4px;}
 
 #login{
 	margin:auto auto;
@@ -163,8 +163,9 @@ button {
 	font-weight:bold;
 	display: block;
 	background-color: orange;
-	padding: 5px;
+	padding: 3px;
 }
+
 
 td .cancel_link{
 	text-decoration:underline;
@@ -173,9 +174,6 @@ td .cancel_link{
 div.oi.error{
 	margin:0px;
 	width:100%;
-}
-.weekend{
-	background:red;
 }
 
 fieldset {
@@ -221,12 +219,12 @@ fieldset legend {
 	margin: auto;
 }
 
-.oi_error{
-	background-color: red;
-}
-
-.oi_message{
-	background-color: orange;
+.badge{
+	background-color: white;
+	font-weight: normal;
+	padding: 2px;
+	font-size: 11px;
+	color: maroon;
 }
 
 #sendingorder, #sendingstatus{
@@ -262,11 +260,30 @@ td.currency{
 	color: white;
 }
 
+.locpick{
+    padding: 2px;
+    cursor: pointer;
+    display: block;
+    text-align: center;
+}
+
+
 input.label-opt{
     width:35px;
+}
+
+.locpick{
+    display: inline-block;
+    padding: 4px;
+    background-color: orange;
 }
 
 img.sign{
     width:100px;
     height:auto;
+}
+
+span.textred{
+    color: red;
+    font-weight: bold;
 }
