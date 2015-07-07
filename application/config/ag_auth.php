@@ -31,9 +31,9 @@ $config['auth_login'] = 'admin/delivery/incoming';
 /**
 * The default URI string to redirect to after a successful logout.
 */
-
+$config['auth_logout'] = 'login';
+/*
 if($_SERVER['HTTP_HOST'] == 'localhost'){
-	$config['auth_logout'] = 'login';
 }else{
 	//online version should redirect to main site
     if( preg_match('/sandbox/i',$_SERVER['REQUEST_URI'])){
@@ -42,6 +42,7 @@ if($_SERVER['HTTP_HOST'] == 'localhost'){
         $config['auth_logout'] = 'http://www.jayonexpress.com/';
     }
 }
+*/
 //print $_SERVER['REQUEST_URI']."\r\n";
 //print $config['auth_logout'];
 
